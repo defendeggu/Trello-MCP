@@ -1,0 +1,14 @@
+{
+  "name": "trello-n8n-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Trello integration via N8N",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
