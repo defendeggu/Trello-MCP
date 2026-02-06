@@ -1,89 +1,89 @@
 # 🎯 Trello MCP Server
 
-Verbindet Claude direkt mit Trello – ohne Middleware, ohne Umwege. 🚀
+Connects Claude directly to Trello – no middleware, no detours. 🚀
 
 ```
 Claude Code / Claude Desktop  --MCP-->  MCP-Server  --API-->  Trello
 ```
 
-## 🛠️ Verfügbare Tools
+## 🛠️ Available Tools
 
-| Tool | Beschreibung |
+| Tool | Description |
 |------|-------------|
-| `trello_list_boards` | 📋 Alle Boards auflisten |
-| `trello_list_lists` | 📝 Listen eines Boards abfragen |
-| `trello_list_cards` | 🃏 Karten einer Liste abfragen |
-| `trello_get_card` | 🔍 Kartendetails abrufen |
-| `trello_create_card` | ✨ Neue Karte erstellen |
-| `trello_update_card` | ✏️ Karte aktualisieren |
-| `trello_move_card` | ↔️ Karte verschieben |
-| `trello_add_comment` | 💬 Kommentar schreiben |
+| `trello_list_boards` | 📋 List all boards |
+| `trello_list_lists` | 📝 Get lists from a board |
+| `trello_list_cards` | 🃏 Get cards from a list |
+| `trello_get_card` | 🔍 Get card details |
+| `trello_create_card` | ✨ Create a new card |
+| `trello_update_card` | ✏️ Update a card |
+| `trello_move_card` | ↔️ Move a card to another list |
+| `trello_add_comment` | 💬 Add a comment to a card |
 
 ## ⚡ Setup
 
-### 1. 🔑 Trello API Key und Token besorgen
+### 1. 🔑 Get your Trello API Key and Token
 
-1. Gehe zu https://trello.com/power-ups/admin
-2. Klicke auf "Neu" (oder wähle ein bestehendes Power-Up)
-3. Unter "API-Schlüssel" findest du deinen **API Key**
-4. Klicke neben dem API Key auf den Link "Token manuell generieren"
-5. Erlaube den Zugriff – du erhältst deinen **API Token** 🎉
+1. Go to https://trello.com/power-ups/admin
+2. Click "New" (or select an existing Power-Up)
+3. Under "API Key" you'll find your **API Key**
+4. Click the "manually generate a Token" link next to the API Key
+5. Grant access – you'll receive your **API Token** 🎉
 
-### 2. 📦 MCP Server installieren
+### 2. 📦 Install the MCP Server
 
 ```bash
 cd mcp-server
 npm install
 ```
 
-### 3. 🔧 Environment konfigurieren
+### 3. 🔧 Configure Environment
 
-Erstelle eine `.env`-Datei im `mcp-server/`-Ordner:
+Create a `.env` file in the `mcp-server/` directory:
 
 ```
-TRELLO_API_KEY=dein-api-key
-TRELLO_API_TOKEN=dein-api-token
+TRELLO_API_KEY=your-api-key
+TRELLO_API_TOKEN=your-api-token
 ```
 
-### 4. 🖥️ Claude Code konfigurieren
+### 4. 🖥️ Configure Claude Code
 
-Die Datei `.mcp.json` im Projektordner enthält die MCP-Konfiguration. Passe bei Bedarf die Credentials in `.claude/settings.local.json` an:
+The `.mcp.json` file in the project root contains the MCP configuration. If needed, set your credentials in `.claude/settings.local.json`:
 
 ```json
 {
   "mcpServers": {
     "trello": {
       "env": {
-        "TRELLO_API_KEY": "dein-api-key",
-        "TRELLO_API_TOKEN": "dein-api-token"
+        "TRELLO_API_KEY": "your-api-key",
+        "TRELLO_API_TOKEN": "your-api-token"
       }
     }
   }
 }
 ```
 
-### 5. 🔄 Neu starten
+### 5. 🔄 Restart
 
-Starte Claude Code neu, damit der MCP-Server geladen wird. Danach stehen die Trello-Tools direkt zur Verfügung! 🎊
+Restart Claude Code so the MCP server gets loaded. After that, the Trello tools are available right away! 🎊
 
 ## 🖥️ Claude Desktop Setup
 
-Du möchtest den MCP-Server mit **Claude Desktop** auf einem anderen PC nutzen? 👉 Siehe [CLAUDE-DESKTOP-SETUP.md](CLAUDE-DESKTOP-SETUP.md)
+Want to use the MCP server with **Claude Desktop** on another PC? 👉 See [CLAUDE-DESKTOP-SETUP.md](CLAUDE-DESKTOP-SETUP.md)
 
-## 🧪 Testen
+## 🧪 Testing
 
-Trello API direkt testen:
+Test the Trello API directly:
 
 ```bash
-curl -s "https://api.trello.com/1/members/me/boards?key=DEIN_API_KEY&token=DEIN_API_TOKEN"
+curl -s "https://api.trello.com/1/members/me/boards?key=YOUR_API_KEY&token=YOUR_API_TOKEN"
 ```
 
-Oder einfach in Claude fragen:
+Or simply ask Claude:
 
-> *"Zeig mir alle meine Trello-Boards"* 💬
+> *"Show me all my Trello boards"* 💬
 
-## 📋 Voraussetzungen
+## 📋 Prerequisites
 
 - ✅ Node.js >= 18
-- ✅ Trello Account mit API-Zugang
-- ✅ Claude Code oder Claude Desktop
+- ✅ Trello account with API access
+- ✅ Claude Code or Claude Desktop
