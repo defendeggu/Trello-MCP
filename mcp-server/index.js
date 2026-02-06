@@ -6,10 +6,9 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-const N8N_WEBHOOK_URL =
-  process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/trello';
 const TRELLO_API_KEY = process.env.TRELLO_API_KEY;
 const TRELLO_API_TOKEN = process.env.TRELLO_API_TOKEN;
+const TRELLO_BASE_URL = 'https://api.trello.com/1';
 
 if (!TRELLO_API_KEY || !TRELLO_API_TOKEN) {
   console.error(
@@ -18,8 +17,32 @@ if (!TRELLO_API_KEY || !TRELLO_API_TOKEN) {
   process.exit(1);
 }
 
+async function callTrello(method, path, body) {
+  const url = new URL(`${TRELLO_BASE_URL}${path}`);
+  url.searchParams.set('key', TRELLO_API_KEY);
+  url.searchParams.set('token', TRELLO_API_TOKEN);
+
+  const options = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+
+  if (body && (method === 'POST' || method === 'PUT')) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url.toString(), options);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Trello API error (${response.status}): ${errorText}`);
+  }
+
+  return response.json();
+}
+
 const server = new Server(
-  { name: 'trello-n8n', version: '1.0.0' },
+  { name: 'trello-mcp', version: '1.1.0' },
   { capabilities: { tools: {} } }
 );
 
@@ -156,63 +179,67 @@ const tools = [
   },
 ];
 
-const toolActionMap = {
-  trello_list_boards: 'list_boards',
-  trello_list_lists: 'list_lists',
-  trello_list_cards: 'list_cards',
-  trello_get_card: 'get_card',
-  trello_create_card: 'create_card',
-  trello_update_card: 'update_card',
-  trello_move_card: 'move_card',
-  trello_add_comment: 'add_comment',
-};
+async function handleToolCall(name, args) {
+  switch (name) {
+    case 'trello_list_boards':
+      return await callTrello('GET', '/members/me/boards');
+
+    case 'trello_list_lists':
+      return await callTrello('GET', `/boards/${args.boardId}/lists`);
+
+    case 'trello_list_cards':
+      return await callTrello('GET', `/lists/${args.listId}/cards`);
+
+    case 'trello_get_card':
+      return await callTrello('GET', `/cards/${args.cardId}`);
+
+    case 'trello_create_card': {
+      const body = { idList: args.listId, name: args.name };
+      if (args.description) body.desc = args.description;
+      if (args.due) body.due = args.due;
+      if (args.pos) body.pos = args.pos;
+      return await callTrello('POST', '/cards', body);
+    }
+
+    case 'trello_update_card': {
+      const body = {};
+      if (args.name !== undefined) body.name = args.name;
+      if (args.description !== undefined) body.desc = args.description;
+      if (args.due !== undefined) body.due = args.due;
+      if (args.closed !== undefined) body.closed = args.closed;
+      return await callTrello('PUT', `/cards/${args.cardId}`, body);
+    }
+
+    case 'trello_move_card': {
+      const body = { idList: args.listId };
+      if (args.pos) body.pos = args.pos;
+      return await callTrello('PUT', `/cards/${args.cardId}`, body);
+    }
+
+    case 'trello_add_comment':
+      return await callTrello('POST', `/cards/${args.cardId}/actions/comments`, {
+        text: args.text,
+      });
+
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+}
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
-  const action = toolActionMap[name];
-  if (!action) {
-    return {
-      content: [{ type: 'text', text: `Unknown tool: ${name}` }],
-      isError: true,
-    };
-  }
-
   try {
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        params: args || {},
-        apiKey: TRELLO_API_KEY,
-        apiToken: TRELLO_API_TOKEN,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!result.success) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Trello API error: ${JSON.stringify(result.error, null, 2)}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-
+    const result = await handleToolCall(name, args || {});
     return {
-      content: [{ type: 'text', text: JSON.stringify(result.data, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
     };
   } catch (error) {
     return {
       content: [
-        { type: 'text', text: `Error calling N8N webhook: ${error.message}` },
+        { type: 'text', text: `Error: ${error.message}` },
       ],
       isError: true,
     };

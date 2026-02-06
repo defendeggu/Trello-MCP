@@ -1,7 +1,7 @@
 {
-  "name": "trello-n8n-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for Trello integration via N8N",
+  "name": "trello-mcp",
+  "version": "1.1.0",
+  "description": "MCP server for direct Trello API integration",
   "type": "module",
   "main": "index.js",
   "scripts": {
