@@ -1,55 +1,55 @@
-# MCP-Server mit Claude Desktop verwenden
+# Using the MCP Server with Claude Desktop
 
-## 1. MCP-Server auf den anderen PC kopieren
+## 1. Copy the MCP Server to your PC
 
-Den `mcp-server/`-Ordner auf den anderen PC kopieren und dort die Dependencies installieren:
+Copy the `mcp-server/` folder to your PC and install the dependencies:
 
 ```bash
 cd mcp-server
 npm install
 ```
 
-## 2. `.env`-Datei anlegen
+## 2. Create a `.env` file
 
-Im `mcp-server/`-Ordner eine `.env` mit deinen Trello-Credentials erstellen:
+Create a `.env` file in the `mcp-server/` directory with your Trello credentials:
 
 ```
-TRELLO_API_KEY=dein-api-key
-TRELLO_API_TOKEN=dein-api-token
+TRELLO_API_KEY=your-api-key
+TRELLO_API_TOKEN=your-api-token
 ```
 
-Credentials erhältst du unter: https://trello.com/power-ups/admin
+You can get your credentials at: https://trello.com/power-ups/admin
 
-## 3. Claude Desktop konfigurieren
+## 3. Configure Claude Desktop
 
-Die Datei `claude_desktop_config.json` bearbeiten:
+Edit the `claude_desktop_config.json` file:
 
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-Folgenden Inhalt einfügen (Pfad anpassen):
+Add the following configuration (adjust the path):
 
 ```json
 {
   "mcpServers": {
     "trello": {
       "command": "node",
-      "args": ["/voller/pfad/zum/mcp-server/index.js"],
+      "args": ["/full/path/to/mcp-server/index.js"],
       "env": {
-        "TRELLO_API_KEY": "dein-api-key",
-        "TRELLO_API_TOKEN": "dein-api-token"
+        "TRELLO_API_KEY": "your-api-key",
+        "TRELLO_API_TOKEN": "your-api-token"
       }
     }
   }
 }
 ```
 
-> **Tipp:** Du kannst die Credentials entweder in der `.env`-Datei *oder* direkt im `env`-Block der Config angeben - beides funktioniert.
+> **Tip:** You can provide credentials either in the `.env` file *or* directly in the `env` block of the config — both work.
 
-## 4. Claude Desktop neu starten
+## 4. Restart Claude Desktop
 
-Nach dem Speichern Claude Desktop neu starten. Der Trello-MCP sollte dann als Tool verfügbar sein.
+After saving, restart Claude Desktop. The Trello MCP tools should then be available.
 
-## Hinweis
+## Note
 
-Da der Server via **stdio** kommuniziert, muss er lokal auf dem jeweiligen PC laufen. Wenn du ihn remote nutzen willst (ohne den Code zu kopieren), bräuchtest du einen HTTP/SSE-Transport - das wäre eine Erweiterung des aktuellen Servers.
+Since the server communicates via **stdio**, it must run locally on each PC. If you want to use it remotely (without copying the code), you would need an HTTP/SSE transport — that would be an extension of the current server.
